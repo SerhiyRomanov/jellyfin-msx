@@ -5,6 +5,9 @@ from app.config import AppConfig
 from app.endpoints.router import router
 
 app_config = AppConfig()
+
+print(f"Started with app_config {app_config.model_dump()}")
+
 app = FastAPI(debug=True)
 
 app.add_middleware(
