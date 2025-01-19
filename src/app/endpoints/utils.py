@@ -9,7 +9,7 @@ def build_msx_uri(url: str) -> str:
     parsed_config_url = URL(str(config.msx_url))
     parsed_target = URL(url)
 
-    parsed_target.replace(
+    parsed_target = parsed_target.replace(
         scheme=parsed_config_url.scheme,
         netloc=parsed_config_url.netloc,
         port=parsed_config_url.port
