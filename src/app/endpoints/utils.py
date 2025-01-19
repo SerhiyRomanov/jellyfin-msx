@@ -14,5 +14,5 @@ def build_msx_uri(url: str) -> str:
         netloc=parsed_config_url.netloc,
         port=parsed_config_url.port
     )
-
+    print(f"build_msx_uri {str(parsed_target)}")
     return str(parsed_target)
