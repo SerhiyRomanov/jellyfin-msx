@@ -1,0 +1,14 @@
+services:
+
+  jmsx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: uvicorn app.app:app --host 0.0.0.0 --port 8090
+    environment:
+      - MSX_URL=http://127.0.0.1:8000
+      - SESSION_FILE_STORAGE_PATH=/tmp/jmsx_session
+    ports:
+      - 8000:8090
+    volumes:
+      - ./jmsx_session:/tmp/jmsx_session
