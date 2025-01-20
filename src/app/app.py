@@ -1,12 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import AppConfig
+# from app.config import AppConfig
 from app.endpoints.router import router
 
-app_config = AppConfig()
-
-print(f"Started with app_config {app_config.model_dump()}")
 
 app = FastAPI(debug=True)
 
@@ -19,6 +16,7 @@ app.add_middleware(
 )
 
 # No luck with set up that properly
+# app_config = AppConfig()
 # app.add_middleware(
 #     SessionMiddleware,
 #     secret_key=app_config.session_secret_key,

@@ -39,3 +39,5 @@ class SessionFileStorage(BaseSessionStorage):
         values = self._load_session(session_key)
         values[key] = value
         self._save_session(session_key, values)
+
+    # TODO: Implement clear()

@@ -18,6 +18,7 @@ def get_jellyfin_client(session: UserSessionDep) -> JellyfinAsyncClient:
     if session.is_authenticated():
         auth_data = session.get_auth_data()
         jellyfin = JellyfinAsyncClient()
+        jellyfin.app_config.device = "Jellyfin-MSX"
         jellyfin.app_config.device_id = session.session_key
         jellyfin.auth_config.server_url = auth_data.server_url
         jellyfin.auth_config.access_token = auth_data.access_token

@@ -82,11 +82,17 @@ class JellyfinAsyncClient:
             response.raise_for_status()
             return response.json()
 
-    def create_video_stream_url(self, item_id: str, container: str = None, params: dict = None) -> str:
+    def create_videos_stream_url(self, item_id: str, container: str = None, params: dict = None) -> str:
         url = self._create_full_url(self.auth_config.server_url, f"/Videos/{item_id}/stream")
         if container:
             url += f".{container}"
 
+        if params is not None:
+            url = add_query_params(url, params)
+        return url
+
+    def create_items_image_url(self, item_id: str, image_type: str, params: dict = None) -> str:
+        url = self._create_full_url(self.auth_config.server_url, f"/Items/{item_id}/Images/{image_type}")
         if params is not None:
             url = add_query_params(url, params)
         return url

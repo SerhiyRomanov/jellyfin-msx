@@ -10,9 +10,14 @@ class Template(BaseModel):
 
 class ContentItem(BaseModel):
     """ https://msx.benzac.de/wiki/index.php?title=Content_Item_Object """
-    label: str
+    label: str = ""
+    title: str = ""
+    titleHeader: str = ""
+    titleFooter: str = ""
     action: str = ""
     icon: str = ""
+    image: str = ""
+    imageFiller: str = ""
     enumerate: bool = True
     alignment: str = "left"
     centration: str | None = None

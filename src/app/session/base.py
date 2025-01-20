@@ -8,3 +8,6 @@ class BaseSessionStorage(ABC):
 
     def set(self, session_key, key: str, value: str) -> None:
         raise NotImplementedError
+
+    def clear(self, session_key: str) -> None:
+        raise NotImplementedError

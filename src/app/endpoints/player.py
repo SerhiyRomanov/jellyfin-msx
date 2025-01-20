@@ -11,7 +11,7 @@ router = APIRouter()
 async def player_json(request: Request, item_id: str, platform: str, player: str, jellyfin_client: JellyFinDep):
     # TODO: Use platform/player parameters to serve supported container for different platforms
 
-    url = jellyfin_client.create_video_stream_url(
+    url = jellyfin_client.create_videos_stream_url(
         item_id,
         container="mp4",
         params=dict(

@@ -18,7 +18,9 @@ async def home_json(request: Request, jellyfin_client: JellyFinDep):
 
         content_items.append(
             ContentItem(
-                label=item["Name"],
+                title=item["Name"],
+                image=jellyfin_client.create_items_image_url(item["Id"], "Primary"),
+                imageFiller="smart",
                 action="content:" + add_query_params(content_json_url, dict(item_id=item["Id"]))
             )
         )

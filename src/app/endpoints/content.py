@@ -28,24 +28,27 @@ async def content_json(request: Request, item_id: str, jellyfin_client: JellyFin
 
     for item in resp_items["Items"]:
         match item["Type"]:
-            # case "CollectionFolder" | "Folder":
-            #     content_items.append(
-            #         ContentItem(
-            #             label=item["Name"],
-            #             action="content:" + add_query_params(content_json_url, dict(item_id=item["Id"]))
-            #         )
-            #     )
-            case "Movie":
-
+            case "Folder" | "Series" | "Season" | "BoxSet":
                 content_items.append(
                     ContentItem(
-                        label=item["Name"],
+                        title=item["Name"],
+                        image=jellyfin_client.create_items_image_url(item["Id"], "Primary"),
+                        imageFiller="smart",
+                        action="content:" + add_query_params(content_json_url, dict(item_id=item["Id"]))
+                    )
+                )
+            case "Movie" | "Episode":
+                content_items.append(
+                    ContentItem(
+                        title=item["Name"],
+                        image=jellyfin_client.create_items_image_url(item["Id"], "Primary"),
+                        imageFiller="smart",
                         action=f"execute:fetch:{add_query_params(player_json_url, dict(item_id=item['Id']))}"
                     )
                 )
 
     return ContentRoot(
-        type=ContentRoot.Type.pages.value,
+        type=ContentRoot.Type.list.value,
         template=Template(layout="0,0,4,3"),
         items=content_items
     )
