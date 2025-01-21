@@ -80,7 +80,7 @@ def login_json(
 
 
 @router.post("/login")
-async def login(id: str, data: Annotated[Credentials, Body(embed=True)],):
+async def login(id: str, data: Annotated[Credentials, Body(embed=True)]):
     jellyfin = JellyfinAsyncClient()
     jellyfin.app_config.device = "Jellyfin-MSX"
     jellyfin.app_config.device_id = id
@@ -93,7 +93,7 @@ async def login(id: str, data: Annotated[Credentials, Body(embed=True)],):
 
     if resp:
         session = UserSession(id)
-        session.store_auth_data(
+        await session.store_auth_data(
             JellyfinAuthData(
                 server_url=data.server_url,
                 access_token=resp["AccessToken"],

@@ -22,25 +22,25 @@ class UserSession:
     def session_key(self) -> str:
         return self._session_key
 
-    def get_key(self, key: str, default=None) -> str | None:
-        return self.storage.get(self._session_key, key) or default
+    async def get_key(self, key: str, default=None) -> str | None:
+        return await self.storage.get(self._session_key, key) or default
 
-    def set_key(self, key: str, value: str) -> None:
-        return self.storage.set(self._session_key, key, value)
+    async def set_key(self, key: str, value: str) -> None:
+        return await self.storage.set(self._session_key, key, value)
 
-    def delete(self):
-        raise NotImplementedError
+    async def clear(self):
+        await self.storage.clear(self._session_key)
 
     # Convenient methods
-    def store_auth_data(self, data: JellyfinAuthData) -> None:
-        self.set_key(self.key_jellyfin_auth_data, data.model_dump_json())
+    async def store_auth_data(self, data: JellyfinAuthData) -> None:
+        await self.set_key(self.key_jellyfin_auth_data, data.model_dump_json())
 
-    def get_auth_data(self) -> JellyfinAuthData | None:
-        data = self.get_key(self.key_jellyfin_auth_data)
+    async def get_auth_data(self) -> JellyfinAuthData | None:
+        data = await self.get_key(self.key_jellyfin_auth_data)
         if data:
             parsed = json.loads(data)
             return JellyfinAuthData(**parsed)
         return None
 
-    def is_authenticated(self) -> bool:
-        return self.get_key(self.key_jellyfin_auth_data) is not None
+    async def is_authenticated(self) -> bool:
+        return await self.get_key(self.key_jellyfin_auth_data) is not None

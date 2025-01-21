@@ -1,11 +1,12 @@
 import json
 import os
 
+from anyio import Path
+
 from app.config import AppConfig
 from app.session.base import BaseSessionStorage
 
 
-# TODO: Convert to async implementation
 class SessionFileStorage(BaseSessionStorage):
     folder: str
 
@@ -16,28 +17,29 @@ class SessionFileStorage(BaseSessionStorage):
         if not os.path.exists(self.folder):
             os.mkdir(self.folder)
 
-    def _get_file_name(self, key):
-        return f"{self.folder}{key}.json"
+    def _get_session_path_object(self, key) -> Path:
+        return Path(f"{self.folder}{key}.json")
 
-    def _load_session(self, key: str) -> dict:
+    async def _load_session(self, key: str) -> dict:
         # TODO: Implement expiration check using app_config.session_max_age
-        fn = self._get_file_name(key)
-        if os.path.exists(fn):
-            with open(fn, "r") as f:
-                return json.loads(f.read())
+        session_file = self._get_session_path_object(key)
+        if await session_file.exists():
+            return json.loads(await session_file.read_bytes())
         return dict()
 
-    def _save_session(self, key: str, data: dict) -> None:
-        with open(self._get_file_name(key), "w") as f:
-            f.write(json.dumps(data))
+    async def _save_session(self, key: str, data: dict) -> None:
+        session_file = self._get_session_path_object(key)
+        await session_file.write_text(json.dumps(data))
 
-    def get(self, session_key: str, key: str) -> str | None:
-        values = self._load_session(session_key)
+    async def get(self, session_key: str, key: str) -> str | None:
+        values = await self._load_session(session_key)
         return values.get(key)
 
-    def set(self, session_key: str, key: str, value: str) -> None:
-        values = self._load_session(session_key)
+    async def set(self, session_key: str, key: str, value: str) -> None:
+        values = await self._load_session(session_key)
         values[key] = value
-        self._save_session(session_key, values)
+        await self._save_session(session_key, values)
 
-    # TODO: Implement clear()
+    async def clear(self, session_key: str) -> None:
+        session_file = self._get_session_path_object(session_key)
+        await session_file.unlink()

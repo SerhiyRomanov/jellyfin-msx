@@ -10,8 +10,8 @@ router = APIRouter()
 
 
 @router.get("/menu.json")
-def menu_json(request: Request, user_session: UserSessionDep):
-    if user_session.is_authenticated():
+async def menu_json(request: Request, user_session: UserSessionDep):
+    if await user_session.is_authenticated():
         home_page_url = build_msx_uri(str(request.url_for("home_json")))
         return Menu(
             menu=[
