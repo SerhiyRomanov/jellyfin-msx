@@ -13,6 +13,13 @@ Any pull requests, suggestions, and other type of collaboration are highly welco
  - Install dependencies from [src/requirements.txt](src%2Frequirements.txt)
  - run via `python -m uvicorn app.app:app --host 0.0.0.0 --reload`
 
+## Structure of project
+ - `src/app` - the FastAPI application with endpoints and session implementation
+ - `src/msx_models` - Pydantic-based models for MSX Object. _Potentially can be as separate package in the future
+    therefore please consider to adding only necessary dependencies_
+ - `src/jellyfin-api` - Asynchronous API Client for https://api.jellyfin.org/. _Potentially can be as separate package in the future
+    therefore please consider to adding only necessary dependencies_
+
 # Run with Docker
 See [docker-compose-example.yml](docker-compose-example.yml)
 
