@@ -3,7 +3,7 @@ from fastapi import APIRouter, Request
 from app.dependencies import JellyFinDep
 from app.endpoints.utils import build_msx_uri
 from msx_models.content import ContentRoot, ContentItem, Template
-from msx_models.utils import expect_keywords, add_query_params
+from msx_models.utils import add_query_params
 
 router = APIRouter()
 
@@ -14,7 +14,7 @@ async def home_json(request: Request, jellyfin_client: JellyFinDep):
 
     content_items = []
     for item in resp["Items"]:
-        content_json_url = expect_keywords(build_msx_uri(str(request.url_for("content_json"))))
+        content_json_url = build_msx_uri(str(request.url_for("content_json")))
 
         content_items.append(
             ContentItem(

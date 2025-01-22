@@ -13,12 +13,12 @@ class MenuItem(BaseModel):
         separator = "separator"
         settings = "settings"
 
-    label: str
+    label: str = ""
     type: str = Type.default.value
     data: str | ContentRoot = ""
 
 
 class Menu(BaseModel):
     headline: str = "Menu"
-
+    cache: bool = True
     menu: List[MenuItem]

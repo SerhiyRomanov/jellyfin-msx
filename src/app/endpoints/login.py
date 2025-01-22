@@ -3,11 +3,13 @@ from typing import Annotated
 from fastapi import APIRouter, Request, Body
 from pydantic import BaseModel
 
+from app.dependencies import UserSessionDep
 from app.session.user_session import UserSession, JellyfinAuthData
 from jellyfin_api.api import JellyfinAsyncClient
+from msx_models.content import ContentRoot, ContentPage, ContentItem
 from msx_models.plugins.input_plugin import InputPluginAction, InputPlugin
 from msx_models.response import Response, ResponseBody
-from msx_models.utils import add_query_params, expect_keywords
+from msx_models.utils import add_query_params
 
 from app.endpoints.utils import build_msx_uri
 
@@ -72,7 +74,7 @@ def login_json(
             return Response(
                 response=ResponseBody(
                     data=dict(
-                        action=f"execute:accurate:{expect_keywords(login_service)}",
+                        action=f"execute:accurate:{login_service}",
                         data=credentials.model_dump()
                     )
                 )
@@ -106,4 +108,42 @@ async def login(id: str, data: Annotated[Credentials, Body(embed=True)]):
 
     return Response(
         response=ResponseBody(data=dict(action="error:Unable to login"))
+    )
+
+
+@router.get("/server_info.json")
+async def server_info_json(request: Request, user_session: UserSessionDep):
+    auth_data = await user_session.get_auth_data()
+    logout_url = build_msx_uri(str(request.url_for("logout")))
+
+    return ContentRoot(
+        type=ContentRoot.Type.pages.value,
+        pages=[ContentPage(
+            items=[
+                ContentItem(
+                    layout="0,0,12,2",
+                    text=f"Server URL: {auth_data.server_url}",
+                    enumerate=False,
+                ),
+                ContentItem(
+                    type=ContentItem.Type.default,
+                    layout="0,3,12,1",
+                    label="Logout",
+                    enumerate=False,
+                    action=f"execute:accurate:{logout_url}",
+                )
+            ]
+        )]
+    )
+
+
+@router.post("/logout")
+async def logout(user_session: UserSessionDep):
+    await user_session.clear()
+    return Response(
+        response=ResponseBody(
+            data=dict(
+                action="[info:Successfully logged out|reload]",
+            )
+        )
     )

@@ -4,7 +4,6 @@ from app.dependencies import UserSessionDep
 from app.endpoints.utils import build_msx_uri
 from msx_models.content import ContentRoot, ContentItem, Template
 from msx_models.menu import Menu, MenuItem
-from msx_models.utils import expect_keywords
 
 router = APIRouter()
 
@@ -12,15 +11,22 @@ router = APIRouter()
 @router.get("/menu.json")
 async def menu_json(request: Request, user_session: UserSessionDep):
     if await user_session.is_authenticated():
-        home_page_url = build_msx_uri(str(request.url_for("home_json")))
         return Menu(
+            cache=False,
             menu=[
                 MenuItem(
                     label="Home",
-                    data=f"{expect_keywords(home_page_url)}"
+                    data=build_msx_uri(str(request.url_for("home_json"))),
                 ),
                 MenuItem(
                     label="Recently watched (TODO)"
+                ),
+                MenuItem(
+                    type=MenuItem.Type.separator.value,
+                ),
+                MenuItem(
+                    label="Server info",
+                    data=build_msx_uri(str(request.url_for("server_info_json"))),
                 ),
             ]
         )
@@ -28,6 +34,7 @@ async def menu_json(request: Request, user_session: UserSessionDep):
         # Non authorised, show Login screen
         login_endpoint = build_msx_uri(str(request.url_for("login_json")))
         return Menu(
+            cache=False,
             menu=[
                 MenuItem(
                     label="Login",

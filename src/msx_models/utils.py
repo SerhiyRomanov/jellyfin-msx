@@ -13,10 +13,10 @@ def add_query_params(url: str, query_params: dict) -> str:
 
 def expect_keywords(url: str, keywords: list = None) -> str:
     """ https://msx.benzac.de/wiki/index.php?title=Requests """
-    keywords = keywords or ["ID"]
+    keywords = keywords or []
 
     params = dict()
-    for key in keywords:
+    for key in set(keywords):
         key = str(key).lower()
         params[key] = "{" + key.upper() + "}"
 
