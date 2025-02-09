@@ -21,10 +21,22 @@ class AuthConfig:
 
 class JellyfinAsyncClient:
     app_config: AppConfig
+    auth_config: AuthConfig
+
+    _http_client: httpx.AsyncClient | None
 
     def __init__(self, config: AppConfig = None):
+        self._http_client = None
         self.app_config = config or AppConfig()
         self.auth_config = config or AuthConfig()
+
+    async def __aenter__(self):
+        self._http_client = httpx.AsyncClient()
+        return self
+
+    async def __aexit__(self, *args, **kwargs):
+        if self._http_client is not None:
+            await self._http_client.aclose()
 
     def _get_authenication_header(self):
         params = {}
@@ -73,7 +85,16 @@ class JellyfinAsyncClient:
         return server_url + endpoint
 
     async def request(self, method: str, endpoint: str, **kwargs) -> dict:
-        async with httpx.AsyncClient(headers=self._get_default_headers()) as client:
+        if self._http_client:
+            close_after_request = False
+            client = self._http_client
+        else:
+            close_after_request = True
+            client = httpx.AsyncClient()
+
+        client.headers = self._get_default_headers()
+
+        try:
             response = await client.request(
                 method=method,
                 url=self._create_full_url(self.auth_config.server_url, endpoint),
@@ -81,6 +102,9 @@ class JellyfinAsyncClient:
             )
             response.raise_for_status()
             return response.json()
+        finally:
+            if close_after_request:
+                await client.aclose()
 
     def create_videos_stream_url(self, item_id: str, container: str = None, params: dict = None) -> str:
         url = self._create_full_url(self.auth_config.server_url, f"/Videos/{item_id}/stream")

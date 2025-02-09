@@ -48,7 +48,7 @@ async def content_json(request: Request, item_id: str, jellyfin_client: JellyFin
                 )
 
     return ContentRoot(
-        type=ContentRoot.Type.list.value,
-        template=Template(layout="0,0,4,3"),
+        type=ContentRoot.Type.pages.value,
+        template=Template(layout="0,0,3,6"),
         items=content_items
     )

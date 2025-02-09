@@ -3,9 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Request, Body
 from pydantic import BaseModel
 
-from app.dependencies import UserSessionDep
+from app.dependencies import UserSessionDep, JellyFinDep
 from app.session.user_session import UserSession, JellyfinAuthData
-from jellyfin_api.api import JellyfinAsyncClient
 from msx_models.content import ContentRoot, ContentPage, ContentItem
 from msx_models.plugins.input_plugin import InputPluginAction, InputPlugin
 from msx_models.response import Response, ResponseBody
@@ -60,7 +59,8 @@ def login_json(
             enter_password_action = InputPluginAction(
                 url=add_query_params(login_endpoint, dict(step="store_password", **credentials.model_dump())),
                 headline="Enter the password",
-                hint="Enter the password"
+                hint="Enter the password",
+                type="secret"
             )
 
             return Response(
@@ -82,13 +82,12 @@ def login_json(
 
 
 @router.post("/login")
-async def login(id: str, data: Annotated[Credentials, Body(embed=True)]):
-    jellyfin = JellyfinAsyncClient()
-    jellyfin.app_config.device = "Jellyfin-MSX"
-    jellyfin.app_config.device_id = id
-    jellyfin.auth_config.server_url = data.server_url
+async def login(id: str, data: Annotated[Credentials, Body(embed=True)], jellyfin_client: JellyFinDep):
+    jellyfin_client.app_config.device = "Jellyfin-MSX"
+    jellyfin_client.app_config.device_id = id
+    jellyfin_client.auth_config.server_url = data.server_url
 
-    resp = await jellyfin.request(
+    resp = await jellyfin_client.request(
         "POST", "/Users/AuthenticateByName",
         json=dict(Username=data.username, Pw=data.password)
     )
@@ -117,7 +116,7 @@ async def server_info_json(request: Request, user_session: UserSessionDep):
     logout_url = build_msx_uri(str(request.url_for("logout")))
 
     return ContentRoot(
-        type=ContentRoot.Type.pages.value,
+        type=ContentRoot.Type.list.value,
         pages=[ContentPage(
             items=[
                 ContentItem(
