@@ -11,13 +11,15 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.t
 # main image
 FROM python:3.12-slim
 
-RUN mkdir -p /app && addgroup --system app && adduser --system --group app
 ENV APP_HOME=/app
+ENV SESSIONS_FOLDER=/jmsx_session
+
+RUN mkdir -p $APP_HOME && mkdir -p $SESSIONS_FOLDER && addgroup --system app && adduser --system --group app
 WORKDIR /app
 
 COPY --from=builder $APP_HOME/wheels /wheels
 RUN pip install --no-cache /wheels/*
 COPY ./src $APP_HOME
 
-RUN chown -R app:app $APP_HOME
+RUN chown -R app:app $APP_HOME && chown -R app:app $SESSIONS_FOLDER
 USER app
