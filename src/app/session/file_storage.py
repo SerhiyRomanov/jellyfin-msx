@@ -18,7 +18,7 @@ class SessionFileStorage(BaseSessionStorage):
             os.mkdir(self.folder)
 
     def _get_session_path_object(self, key) -> Path:
-        return Path(f"{self.folder}{key}.json")
+        return Path(self.folder) / f"{key}.json"
 
     async def _load_session(self, key: str) -> dict:
         # TODO: Implement expiration check using app_config.session_max_age

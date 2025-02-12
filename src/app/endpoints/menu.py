@@ -39,12 +39,12 @@ async def menu_json(request: Request, user_session: UserSessionDep):
                 MenuItem(
                     label="Login",
                     data=ContentRoot(
-                        headline="Login to Jellyfin server using username and password",
+                        headline="Login to Jellyfin server",
                         type=ContentRoot.Type.list,
                         template=Template(layout="0,0,12,3"),
                         items=[
                             ContentItem(
-                                label="Login on Jellyfin server",
+                                title="Login to Jellyfin server using username and passwordr",
                                 action=f"execute:fetch:{login_endpoint}",
                                 enumerate=False,
                                 alignment="justify|text-justify",
